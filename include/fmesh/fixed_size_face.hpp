@@ -43,8 +43,8 @@ class fixed_size_face {
 
   template <typename... Args>
   fixed_size_face(Args... args) : vertices_{args...} {
-    static_assert(std::conjunction_v<std::is_same<VertexIndex, Args>...>,
-                  "Argument must be VertexIndex.");
+    static_assert(std::conjunction_v<std::is_same<vertex_index, Args>...>,
+                  "Argument must be vertex_index.");
     static_assert(sizeof...(Args) == N,
                   "The number of arguments must be equal to N.");
   }
