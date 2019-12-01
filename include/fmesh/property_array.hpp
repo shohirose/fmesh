@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,9 +26,9 @@
 #include <cassert>
 #include <vector>
 
+#include "fmesh/allocator.hpp"
 #include "fmesh/index.hpp"
 #include "fmesh/type_traits.hpp"
-#include "fmesh/allocator.hpp"
 
 namespace fmesh {
 
@@ -40,7 +40,7 @@ struct property_array_base {
 template <typename Key, typename T, typename Allocator = allocator<T>>
 class property_array : public property_array_base<Key> {
  public:
-  static_assert(is_index<Key>::value, "Key must be Index type.");
+  static_assert(is_index<Key>::value, "Key must be an index type.");
 
   using base_type = property_array_base<Key>;
 
@@ -81,13 +81,13 @@ class property_array : public property_array_base<Key> {
   std::vector<T, Allocator> values_;
 };
 
-template <typename T, typename Allocator = std::allocator<T>>
+template <typename T, typename Allocator = allocator<T>>
 using vertex_property = property_array<vertex_index, T, Allocator>;
 
-template <typename T, typename Allocator = std::allocator<T>>
+template <typename T, typename Allocator = allocator<T>>
 using edge_property = property_array<edge_index, T, Allocator>;
 
-template <typename T, typename Allocator = std::allocator<T>>
+template <typename T, typename Allocator = allocator<T>>
 using face_property = property_array<face_index, T, Allocator>;
 
 }  // namespace fmesh
