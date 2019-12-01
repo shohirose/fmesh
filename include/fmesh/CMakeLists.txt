@@ -1,0 +1,12 @@
+target_sources(fmesh
+  PUBLIC
+    allocator.hpp
+    edge.hpp
+    index.hpp
+    index_iterator.hpp
+    iterator_range.hpp
+    vector.hpp
+    property_array.hpp
+    property_database.hpp
+    type_traits.hpp
+  )
