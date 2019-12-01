@@ -61,6 +61,11 @@ class property_array : public property_array_base<Key> {
   void reserve(std::size_t capacity) { values_.reserve(capacity); }
   void clear() { values_.clear(); }
 
+  auto begin() noexcept { return values_.begin(); }
+  auto begin() const noexcept { return values_.begin(); }
+  auto end() noexcept { return values_.end(); }
+  auto end() const noexcept { return values_.end(); }
+
   template <typename... Args>
   void emplace_back(Args&&... args) {
     values_.emplace_back(std::forward<Args>(args)...);
