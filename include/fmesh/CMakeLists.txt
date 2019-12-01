@@ -7,6 +7,7 @@ target_sources(fmesh
     iterator_range.hpp
     vector.hpp
     property_array.hpp
-    property_database.hpp
+    property_registry.hpp
     type_traits.hpp
+    fracture_mesh.hpp
   )
