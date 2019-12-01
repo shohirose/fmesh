@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -107,7 +107,15 @@ class fixed_size_face {
     return false;
   }
 
-  friend std::ostream& operator<<(std::ostream& os, const fixed_size_face& face) {
+  friend bool operator==(const fixed_size_face& f1,
+                         const fixed_size_face& f2) noexcept {
+    for (std::size_t i = 0; i < N; ++i)
+      if (f1[i] != f2[i]) return false;
+    return true;
+  }
+
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const fixed_size_face& face) {
     for (auto&& v : face) os << v << ' ';
     return os;
   }
