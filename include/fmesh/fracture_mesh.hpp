@@ -52,7 +52,7 @@ class fracture_mesh {
     return it == fs.end() ? face_index{} : *it;
   }
 
-  vertex_index add_vertex(const Point& p) {
+  vertex_index add(const Point& p) {
     const vertex_index vi{vertices_.size()};
     vertices_.push_back(p);
     const auto n = vertices_.size();
@@ -62,7 +62,7 @@ class fracture_mesh {
     return vi;
   }
 
-  edge_index add_edge(const fmesh::edge& e) {
+  edge_index add(const fmesh::edge& e) {
     if (this->find(e).is_valid()) {
       std::cerr << "Warning: edge [" << e << "] is already registered.\n";
       return edge_index{};
@@ -75,7 +75,7 @@ class fracture_mesh {
     return ei;
   }
 
-  face_index add_face(const Face& f) {
+  face_index add(const Face& f) {
     if (this->find(f).is_valid()) {
       std::cerr << "Warning: face [" << f << "] is already registered.\n";
       return face_index{};
