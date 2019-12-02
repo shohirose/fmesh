@@ -42,10 +42,24 @@ class property_array : public property_array_base<Key> {
  public:
   static_assert(is_index<Key>::value, "Key must be an index type.");
 
+  using array_type = std::vector<T, Allocator>;
+  using value_type = typename array_type::value_type;
+  using allocator_type = typename array_type::allocator_type;
+  using size_type = typename array_type::size_type;
+  using difference_type = typename array_type::difference_type;
+  using reference = typename array_type::reference;
+  using const_reference = typename array_type::const_reference;
+  using pointer = typename array_type::pointer;
+  using const_pointer = typename array_type::const_pointer;
+  using iterator = typename array_type::iterator;
+  using const_iterator = typename array_type::const_iterator;
+  using reverse_iterator = typename array_type::reverse_iterator;
+  using const_reverse_iterator = typename array_type::const_reverse_iterator;
+
   using base_type = property_array_base<Key>;
 
   property_array() = default;
-  property_array(std::size_t size) : base_type{}, values_{size} {}
+  property_array(size_type size) : base_type{}, values_{size} {}
   property_array(std::initializer_list<T> list) : base_type{}, values_{list} {}
   property_array(const property_array&) = default;
   property_array(property_array&&) = default;
@@ -56,15 +70,21 @@ class property_array : public property_array_base<Key> {
   property_array& operator=(property_array&&) = default;
 
   bool empty() const noexcept { return values_.empty(); }
-  auto size() const noexcept { return values_.size(); }
-  void resize(std::size_t size) { values_.resize(size); }
-  void reserve(std::size_t capacity) { values_.reserve(capacity); }
+  size_type size() const noexcept { return values_.size(); }
+  void resize(size_type size) { values_.resize(size); }
+  void reserve(size_type capacity) { values_.reserve(capacity); }
+  size_type capacity() const noexcept { return values_.capacity(); }
   void clear() { values_.clear(); }
 
-  auto begin() noexcept { return values_.begin(); }
-  auto begin() const noexcept { return values_.begin(); }
-  auto end() noexcept { return values_.end(); }
-  auto end() const noexcept { return values_.end(); }
+  iterator begin() noexcept { return values_.begin(); }
+  const_iterator begin() const noexcept { return values_.begin(); }
+  iterator end() noexcept { return values_.end(); }
+  const_iterator end() const noexcept { return values_.end(); }
+
+  reverse_iterator rbegin() noexcept { return values_.rbegin(); }
+  const_reverse_iterator rbegin() const noexcept { return values_.rbegin(); }
+  reverse_iterator rend() noexcept { return values_.rend(); }
+  const_reverse_iterator rend() const noexcept { return values_.rend(); }
 
   template <typename... Args>
   void emplace_back(Args&&... args) {
@@ -73,11 +93,11 @@ class property_array : public property_array_base<Key> {
 
   void push_back(const T& t) { values_.push_back(t); }
 
-  auto& operator[](Key key) noexcept {
+  reference operator[](Key key) noexcept {
     assert(static_cast<std::size_t>(key) < values_.size());
     return values_[static_cast<std::size_t>(key)];
   }
-  const auto& operator[](Key key) const noexcept {
+  const_reference operator[](Key key) const noexcept {
     assert(static_cast<std::size_t>(key) < values_.size());
     return values_[static_cast<std::size_t>(key)];
   }
