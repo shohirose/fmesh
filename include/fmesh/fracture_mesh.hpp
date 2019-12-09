@@ -42,15 +42,24 @@ class fracture_mesh {
   auto num_faces() const noexcept { return faces_.size(); }
 
   /// @brief Checks if a vertex is valid
+  /// @param[in] i Vertex index
+  /// @return Is a given vertex valid?
   bool is_valid(vertex_index i) const noexcept { return is_valid_vertex_[i]; }
 
   /// @brief Checks if an edge is valid
+  /// @param[in] i Edge index
+  /// @return Is a given edge valid?
   bool is_valid(edge_index i) const noexcept { return is_valid_edge_[i]; }
 
   /// @brief Checks if a face is valid
+  /// @param[in] i Face index
+  /// @return Is a given face valid?
   bool is_valid(face_index i) const noexcept { return is_valid_face_[i]; }
 
   /// @brief Find the edge index of a given edge
+  /// @param[in] e Edge
+  /// @return The index of a given edge. If the edge is not found, an invalid
+  /// index is returned.
   edge_index find(const fmesh::edge& e) const noexcept {
     const auto& es = vertex_edges_[e.first];
     const auto it = std::find_if(es.begin(), es.end(), [e, this](auto ei) {
@@ -60,6 +69,9 @@ class fracture_mesh {
   }
 
   /// @brief Find the face index of a given face
+  /// @param[in] f Face
+  /// @return The index of a given face. If the face is not found, an invalid
+  /// index is returned.s
   face_index find(const Face& f) const noexcept {
     const auto& fs = vertex_faces_[f[0]];
     const auto it = std::find_if(fs.begin(), fs.end(), [&f, this](auto fi) {
@@ -106,7 +118,7 @@ class fracture_mesh {
   }
 
   /// @brief Add a new face to mesh
-  /// @param[in] p A new face
+  /// @param[in] f A new face
   /// @return The index of a new face
   ///
   /// This function updates vertex, edge, and face connectivity info.
@@ -145,7 +157,7 @@ class fracture_mesh {
   }
 
   /// @brief Invalidate a given edge
-  /// @param[in] vi Edge index to be invalidated
+  /// @param[in] ei Edge index to be invalidated
   ///
   /// This function invalidates a given edge. In addition, it also invalidates
   /// faces which the edge consists of.
@@ -159,58 +171,97 @@ class fracture_mesh {
   }
 
   /// @brief Invalidate a given face
-  /// @param[in] vi Face index to be invalidated
+  /// @param[in] fi Face index to be invalidated
   void invalidate(face_index fi) {
     has_invalid_faces_ = true;
     is_valid_face_[fi] = false;
   }
 
+  /// @name Vertex iterators
+  /// @{
   auto vertex_begin() noexcept { return vertices_.begin(); }
   auto vertex_begin() const noexcept { return vertices_.begin(); }
   auto vertex_end() noexcept { return vertices_.end(); }
   auto vertex_end() const noexcept { return vertices_.end(); }
+  /// @}
 
+  /// @name Edge iterators
+  /// @{
   auto edge_begin() noexcept { return edges_.begin(); }
   auto edge_begin() const noexcept { return edges_.begin(); }
   auto edge_end() noexcept { return edges_.end(); }
   auto edge_end() const noexcept { return edges_.end(); }
+  /// @}
 
+  /// @name Face iterators
+  /// @{
   auto face_begin() noexcept { return faces_.begin(); }
   auto face_begin() const noexcept { return faces_.begin(); }
   auto face_end() noexcept { return faces_.end(); }
   auto face_end() const noexcept { return faces_.end(); }
+  /// @}
 
+  /// @name Vertex ranges
+  /// @{
   auto vertices() noexcept {
     return make_iterator_range(this->vertex_begin(), this->vertex_end());
   }
   auto vertices() const noexcept {
     return make_iterator_range(this->vertex_begin(), this->vertex_end());
   }
+  /// @}
 
+  /// @name Edge ranges
+  /// @{
   auto edges() noexcept {
     return make_iterator_range(this->edge_begin(), this->edge_end());
   }
   auto edges() const noexcept {
     return make_iterator_range(this->edge_begin(), this->edge_end());
   }
+  /// @}
 
+  /// @name Face ranges
+  /// @{
   auto faces() noexcept {
     return make_iterator_range(this->face_begin(), this->face_end());
   }
   auto faces() const noexcept {
     return make_iterator_range(this->face_begin(), this->face_end());
   }
+  /// @}
 
+  /// @name Accessors
+  /// @{
+
+  /// @brief Get reference to vertex
+  /// @param[in] i Vertex index
+  /// @return Reference to vertex
   auto& vertex(vertex_index i) noexcept { return vertices_[i]; }
-  const auto& vertex(vertex_index i) const noexcept { return vertices_[i]; }
-  const auto& edge(edge_index i) const noexcept { return edges_[i]; }
-  const auto& face(face_index i) const noexcept { return faces_[i]; }
 
+  /// @brief Get const reference to a vertex
+  /// @param[in] i Vertex index
+  /// @return Const reference to a vertex
+  const auto& vertex(vertex_index i) const noexcept { return vertices_[i]; }
+
+  /// @brief Get const reference to an edge
+  /// @param[in] i Edge index
+  /// @return Const reference to an edge
+  const auto& edge(edge_index i) const noexcept { return edges_[i]; }
+
+  /// @brief Get const reference to a face
+  /// @param[in] i Face index
+  /// @return Const reference to a face
+  const auto& face(face_index i) const noexcept { return faces_[i]; }
+  /// @}
+
+  /// @brief Checks if this mesh has invalid mesh entities (vertex, edge, or
+  /// face)
   bool has_invalid_entities() const noexcept {
     return has_invalid_vertices_ || has_invalid_edges_ || has_invalid_faces_;
   }
 
-  /// @brief Removes invalid mesh entities from arrays
+  /// @brief Removes invalid mesh entities from mesh
   void remove_invalid_entities();
 
  private:
