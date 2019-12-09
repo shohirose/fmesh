@@ -20,6 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#ifndef FMESH_FRACTURE_MESH_HPP
+#define FMESH_FRACTURE_MESH_HPP
+
 #include <algorithm>
 #include <vector>
 #include "fmesh/edge.hpp"
@@ -367,3 +370,5 @@ void fracture_mesh<Point, Face>::remove_invalid_entities() {
 }
 
 }  // namespace fmesh
+
+#endif  // FMESH_FRACTURE_MESH_HPP
