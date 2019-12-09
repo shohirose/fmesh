@@ -24,6 +24,7 @@
 #include <vector>
 #include "fmesh/edge.hpp"
 #include "fmesh/index.hpp"
+#include "fmesh/index_iterator.hpp"
 #include "fmesh/iterator_range.hpp"
 #include "fmesh/property_array.hpp"
 
@@ -179,26 +180,28 @@ class fracture_mesh {
 
   /// @name Vertex iterators
   /// @{
-  auto vertex_begin() noexcept { return vertices_.begin(); }
-  auto vertex_begin() const noexcept { return vertices_.begin(); }
-  auto vertex_end() noexcept { return vertices_.end(); }
-  auto vertex_end() const noexcept { return vertices_.end(); }
+  auto vertex_begin() const noexcept {
+    return vertex_iterator{vertex_index{0}};
+  }
+  auto vertex_end() const noexcept {
+    return vertex_iterator{vertex_index{vertices_.size()}};
+  }
   /// @}
 
   /// @name Edge iterators
   /// @{
-  auto edge_begin() noexcept { return edges_.begin(); }
-  auto edge_begin() const noexcept { return edges_.begin(); }
-  auto edge_end() noexcept { return edges_.end(); }
-  auto edge_end() const noexcept { return edges_.end(); }
+  auto edge_begin() const noexcept { return edge_iterator{edge_index{0}}; }
+  auto edge_end() const noexcept {
+    return edge_iterator{edge_index{edges_.size()}};
+  }
   /// @}
 
   /// @name Face iterators
   /// @{
-  auto face_begin() noexcept { return faces_.begin(); }
-  auto face_begin() const noexcept { return faces_.begin(); }
-  auto face_end() noexcept { return faces_.end(); }
-  auto face_end() const noexcept { return faces_.end(); }
+  auto face_begin() const noexcept { return face_iterator{face_index{0}}; }
+  auto face_end() const noexcept {
+    return face_iterator{face_index{faces_.size()}};
+  }
   /// @}
 
   /// @name Vertex ranges
