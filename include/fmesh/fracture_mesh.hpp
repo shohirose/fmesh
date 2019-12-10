@@ -139,31 +139,20 @@ class fracture_mesh {
   }
   /// @}
 
-  /// @name Vertex ranges
+  /// @name Ranges
   /// @{
-  auto vertices() noexcept {
-    return make_iterator_range(this->vertex_begin(), this->vertex_end());
-  }
+
+  /// @brief Returns vertex range
   auto vertices() const noexcept {
     return make_iterator_range(this->vertex_begin(), this->vertex_end());
   }
-  /// @}
 
-  /// @name Edge ranges
-  /// @{
-  auto edges() noexcept {
-    return make_iterator_range(this->edge_begin(), this->edge_end());
-  }
+  /// @brief Returns edge range
   auto edges() const noexcept {
     return make_iterator_range(this->edge_begin(), this->edge_end());
   }
-  /// @}
 
-  /// @name Face ranges
-  /// @{
-  auto faces() noexcept {
-    return make_iterator_range(this->face_begin(), this->face_end());
-  }
+  /// @brief Returns face range
   auto faces() const noexcept {
     return make_iterator_range(this->face_begin(), this->face_end());
   }
