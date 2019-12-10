@@ -36,3 +36,9 @@ build/
 
 # VSCode
 .vscode/
+
+# Doxygen
+doc/html/
+doc/latex/
+doc/doxygen_sqlite3.db
+doc/*.lnk
