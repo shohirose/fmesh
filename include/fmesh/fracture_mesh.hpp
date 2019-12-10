@@ -66,22 +66,20 @@ class fracture_mesh {
   /// index is returned.
   edge_index find(const fmesh::edge& e) const noexcept {
     const auto& es = vertex_edges_[e.first];
-    const auto it = std::find_if(es.begin(), es.end(), [e, this](auto ei) {
-      return this->edges_[ei] == e;
-    });
-    return it == es.end() ? edge_index{} : *it;
+    for (auto&& ei : es)
+      if (edges_[ei] == e) return ei;
+    return edge_index{};
   }
 
   /// @brief Find the face index of a given face
   /// @param[in] f Face
   /// @return The index of a given face. If the face is not found, an invalid
-  /// index is returned.s
+  /// index is returned.
   face_index find(const Face& f) const noexcept {
     const auto& fs = vertex_faces_[f[0]];
-    const auto it = std::find_if(fs.begin(), fs.end(), [&f, this](auto fi) {
-      return this->faces_[fi] == f;
-    });
-    return it == fs.end() ? face_index{} : *it;
+    for (auto&& fi : fs)
+      if (faces_[fi] == f) return fi;
+    return face_index{};
   }
 
   /// @brief Add a new vertex to mesh
@@ -89,37 +87,7 @@ class fracture_mesh {
   /// @return The index of a new vertex
   ///
   /// This function updates vertex connectivity info.
-  vertex_index add(const Point& p) {
-    const vertex_index vi{vertices_.size()};
-    vertices_.push_back(p);
-    const auto n = vertices_.size();
-    vertex_vertices_.resize(n);
-    vertex_edges_.resize(n);
-    vertex_faces_.resize(n);
-    is_valid_vertex_.push_back(true);
-    return vi;
-  }
-
-  /// @brief Add a new edge to mesh
-  /// @param[in] e A new edge
-  /// @return The index of a new edge
-  ///
-  /// This function updates edge connectivity info.
-  /// If the given edge is already registered, an invalid edge index will be
-  /// returned.
-  edge_index add(const fmesh::edge& e) {
-    if (this->find(e).is_valid()) {
-      std::cerr << "Warning: edge [" << e << "] is already registered.\n";
-      return edge_index{};
-    }
-
-    const edge_index ei{edges_.size()};
-    edges_.push_back(e);
-    edge_faces_.resize(edges_.size());
-    is_valid_edge_.push_back(true);
-    this->update_edge_connectivity(e, ei);
-    return ei;
-  }
+  vertex_index add(const Point& p);
 
   /// @brief Add a new face to mesh
   /// @param[in] f A new face
@@ -128,58 +96,22 @@ class fracture_mesh {
   /// This function updates vertex, edge, and face connectivity info.
   /// If the given face is already registered, an invalid face index will be
   /// returned.
-  face_index add(const Face& f) {
-    if (this->find(f).is_valid()) {
-      std::cerr << "Warning: face [" << f << "] is already registered.\n";
-      return face_index{};
-    }
-
-    const face_index fi{faces_.size()};
-    faces_.push_back(f);
-    face_edges_.resize(faces_.size());
-    is_valid_face_.push_back(true);
-    this->update_face_connectivity(f, fi);
-    return fi;
-  }
+  face_index add(const Face& f);
 
   /// @brief Invalidate a given vertex
   /// @param[in] vi Vertex index to be invalidated
   ///
   /// This function invalidates a given vertex. In addition, it also invalidates
-  /// edges and faces connected to the vertex.
-  void invalidate(vertex_index vi) {
-    has_invalid_vertices_ = true;
-    is_valid_vertex_[vi] = false;
-
-    // Invalidate all edges connected to the vertex
-    const auto& es = vertex_edges_[vi];
-    for (auto&& ei : es) is_valid_edge_[ei] = false;
-
-    // Invalidate all faces connected to the vertex
-    const auto& fs = vertex_faces_[vi];
-    for (auto&& fi : fs) is_valid_face_[fi] = false;
-  }
-
-  /// @brief Invalidate a given edge
-  /// @param[in] ei Edge index to be invalidated
-  ///
-  /// This function invalidates a given edge. In addition, it also invalidates
-  /// faces which the edge consists of.
-  void invalidate(edge_index ei) {
-    has_invalid_edges_ = true;
-    is_valid_edge_[ei] = false;
-
-    // Invalidate all faces which the edge consists of
-    const auto& fs = edge_faces_[ei];
-    for (auto&& fi : fs) is_valid_face_[fi] = false;
-  }
+  /// faces which contain the vertex. Isolated edges created by this operations
+  /// are also invalidated.
+  void invalidate(vertex_index vi);
 
   /// @brief Invalidate a given face
   /// @param[in] fi Face index to be invalidated
-  void invalidate(face_index fi) {
-    has_invalid_faces_ = true;
-    is_valid_face_[fi] = false;
-  }
+  ///
+  /// This function invalidates a given face. In addition, it also invalidates
+  /// isolated vertices and edges which consist of the face.
+  void invalidate(face_index fi);
 
   /// @name Vertex iterators
   /// @{
@@ -271,9 +203,34 @@ class fracture_mesh {
   void remove_invalid_entities();
 
  private:
+  /// @brief Update face connectivity data
+  /// @param[in] f A new face
+  /// @param[in] fi The index of a new face
   void update_face_connectivity(const Face& f, const face_index fi) noexcept;
-  void update_edge_connectivity(const fmesh::edge& e,
-                                const edge_index ei) noexcept;
+
+  /// @brief Checks if a given edge is isolated
+  /// @param[in] ei Edge index
+  ///
+  /// Isolated edges do not have any valid faces connected to themselves.
+  bool is_isolated(const edge_index ei) const noexcept {
+    const auto& fs = edge_faces_[ei];
+    const auto num_valid_faces =
+        std::count_if(fs.begin(), fs.end(),
+                      [this](const auto fi) { return this->is_valid(fi); });
+    return num_valid_faces == 0;
+  }
+
+  /// @brief Checks if a given vertex is isolated
+  /// @param[in] vi Vertex index
+  ///
+  /// Isolated vertices do not have any valid faces connected to themselves.
+  bool is_isolated(const vertex_index vi) const noexcept {
+    const auto& fs = vertex_faces_[vi];
+    const auto num_valid_faces =
+        std::count_if(fs.begin(), fs.end(),
+                      [this](const auto fi) { return this->is_valid(fi); });
+    return num_valid_faces == 0;
+  }
 
   // Mesh entities
   vertex_property<Point> vertices_;
@@ -301,6 +258,75 @@ class fracture_mesh {
 };
 
 template <typename Point, typename Face>
+vertex_index fracture_mesh<Point, Face>::add(const Point& p) {
+  const vertex_index vi{vertices_.size()};
+  vertices_.push_back(p);
+  const auto n = vertices_.size();
+  vertex_vertices_.resize(n);
+  vertex_edges_.resize(n);
+  vertex_faces_.resize(n);
+  is_valid_vertex_.push_back(true);
+  return vi;
+}
+
+template <typename Point, typename Face>
+face_index fracture_mesh<Point, Face>::add(const Face& f) {
+  if (this->find(f).is_valid()) {
+    std::cerr << "Warning: face [" << f << "] is already registered.\n";
+    return face_index{};
+  }
+
+  const face_index fi{faces_.size()};
+  faces_.push_back(f);
+  face_edges_.resize(faces_.size());
+  is_valid_face_.push_back(true);
+  this->update_face_connectivity(f, fi);
+  return fi;
+}
+
+template <typename Point, typename Face>
+void fracture_mesh<Point, Face>::invalidate(vertex_index vi) {
+  has_invalid_vertices_ = true;
+  is_valid_vertex_[vi] = false;
+
+  // Invalidate all edges connected to the vertex
+  const auto& es = vertex_edges_[vi];
+  for (auto&& ei : es) is_valid_edge_[ei] = false;
+
+  // Invalidate all faces connected to the vertex
+  const auto& fs = vertex_faces_[vi];
+  for (auto&& fi : fs) is_valid_face_[fi] = false;
+
+  // Invalidate isolated edges
+  for (auto&& fi : fs) {
+    const auto& es = face_edges_[fi];
+    for (auto&& ei : es) {
+      if (this->is_valid(ei) && this->is_isolated(ei))
+        is_valid_edge_[ei] = false;
+    }
+  }
+}
+
+template <typename Point, typename Face>
+void fracture_mesh<Point, Face>::invalidate(face_index fi) {
+  has_invalid_faces_ = true;
+  is_valid_face_[fi] = false;
+
+  // Invalidate isolated edges
+  const auto& es = face_edges_[fi];
+  for (auto&& ei : es) {
+    if (this->is_valid(ei) && this->is_isolated(ei)) is_valid_edge_[ei] = false;
+  }
+
+  // Invalidate isolated vertices
+  const auto& f = faces_[fi];
+  for (auto&& vi : f) {
+    if (this->is_valid(vi) && this->is_isolated(vi))
+      is_valid_vertex_[vi] = false;
+  }
+}
+
+template <typename Point, typename Face>
 void fracture_mesh<Point, Face>::update_face_connectivity(
     const Face& f, const face_index fi) noexcept {
   for (auto&& vi : f) vertex_faces_[vi].push_back(fi);
@@ -315,39 +341,21 @@ void fracture_mesh<Point, Face>::update_face_connectivity(
       face_edges_[fi].push_back(ei);
       edge_faces_[ei].push_back(fi);
     } else {
-      // Edge is new
-      // So first resiter the new edge, and then update all connectivity data.
+      // An edge is new
+      // So first regiter the new edge, and then update all connectivity data.
       const edge_index ej{edges_.size()};
       edges_.push_back(e);
       edge_faces_.resize(edges_.size());
 
-      edge_faces_[ej].push_back(fi);
-      face_edges_[fi].push_back(ej);
+      // Update vertex-edges and vertex-vertices
       vertex_edges_[e.first].push_back(ej);
       vertex_edges_[e.second].push_back(ej);
       vertex_vertices_[e.first].push_back(e.second);
       vertex_vertices_[e.second].push_back(e.first);
-    }
-  }
-}
 
-template <typename Point, typename Face>
-void fracture_mesh<Point, Face>::update_edge_connectivity(
-    const fmesh::edge& e, const edge_index ei) noexcept {
-  // Update vertex-edges and vertex-vertices
-  vertex_edges_[e.first].push_back(ei);
-  vertex_edges_[e.second].push_back(ei);
-  vertex_vertices_[e.first].push_back(e.second);
-  vertex_vertices_[e.second].push_back(e.first);
-
-  // Find faces connected to the edge
-  // Faces connected to both ends of the edge are the ones
-  const auto& fs1 = vertex_faces_[e.first];
-  const auto& fs2 = vertex_faces_[e.second];
-  for (auto&& fi : fs1) {
-    if (std::find(fs2.begin(), fs2.end(), fi) != fs2.end()) {
-      edge_faces_[ei].push_back(fi);
-      face_edges_[fi].push_back(ei);
+      // Update edge-faces and face-edges
+      edge_faces_[ej].push_back(fi);
+      face_edges_[fi].push_back(ej);
     }
   }
 }
