@@ -23,5 +23,8 @@ target_link_libraries(fmesh
   PUBLIC Eigen3::Eigen
   )
 
+add_library(fmesh::fmesh ALIAS fmesh)
+
 add_subdirectory(include)
 add_subdirectory(src)
+add_subdirectory(example)
