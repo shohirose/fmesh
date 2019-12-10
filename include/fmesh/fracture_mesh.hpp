@@ -113,27 +113,31 @@ class fracture_mesh {
   /// isolated vertices and edges which consist of the face.
   void invalidate(face_index fi);
 
-  /// @name Vertex iterators
+  /// @name Iterators
   /// @{
+
+  /// @brief Returns the beginning of vertices
   auto vertex_begin() const noexcept {
     return vertex_iterator{vertex_index{0}};
   }
+
+  /// @brief Returns the end of vertices
   auto vertex_end() const noexcept {
     return vertex_iterator{vertex_index{vertices_.size()}};
   }
-  /// @}
 
-  /// @name Edge iterators
-  /// @{
+  /// @brief Returns the beginning of edges
   auto edge_begin() const noexcept { return edge_iterator{edge_index{0}}; }
+
+  /// @brief Returns the end of edges
   auto edge_end() const noexcept {
     return edge_iterator{edge_index{edges_.size()}};
   }
-  /// @}
 
-  /// @name Face iterators
-  /// @{
+  /// @brief Returns the beginning of faces
   auto face_begin() const noexcept { return face_iterator{face_index{0}}; }
+
+  /// @brief Returns the end of faces
   auto face_end() const noexcept {
     return face_iterator{face_index{faces_.size()}};
   }
@@ -160,11 +164,6 @@ class fracture_mesh {
 
   /// @name Accessors
   /// @{
-
-  /// @brief Get reference to vertex
-  /// @param[in] i Vertex index
-  /// @return Reference to vertex
-  auto& vertex(vertex_index i) noexcept { return vertices_[i]; }
 
   /// @brief Get const reference to a vertex
   /// @param[in] i Vertex index
@@ -221,29 +220,39 @@ class fracture_mesh {
     return num_valid_faces == 0;
   }
 
-  // Mesh entities
+  /// @name Mesh entities
+  /// @{
   vertex_property<Point> vertices_;
   edge_property<fmesh::edge> edges_;
   face_property<Face> faces_;
+  /// @}
 
-  // Mesh connectivity
+  /// @name Mesh connectivity
+  /// @{
   vertex_property<std::vector<vertex_index>> vertex_vertices_;
   vertex_property<std::vector<edge_index>> vertex_edges_;
   vertex_property<std::vector<face_index>> vertex_faces_;
   edge_property<std::vector<face_index>> edge_faces_;
   face_property<std::vector<edge_index>> face_edges_;
+  /// @}
 
-  // Is a mesh entity valid?
-  // Mesh entities can be invalidated.
-  // Call remove_invalid_entities() if you really need to remove them.
+  /// @name Validity of mesh entities
+  ///
+  /// Is a mesh entity valid?
+  /// Mesh entities can be invalidated.
+  /// Call remove_invalid_entities() if you really need to remove them.
+  /// @{
   vertex_property<bool> is_valid_vertex_;
   edge_property<bool> is_valid_edge_;
   face_property<bool> is_valid_face_;
+  /// @}
 
-  // Flags to check if there are any invalid mesh entities.
+  /// @name Flags to check if there are any invalid mesh entities.
+  /// @{
   bool has_invalid_vertices_;
   bool has_invalid_edges_;
   bool has_invalid_faces_;
+  /// @}
 };
 
 template <typename Point, typename Face>
