@@ -86,6 +86,22 @@ class index_iterator {
                          const index_iterator& it2) noexcept {
     return !(it1 == it2);
   }
+  friend bool operator<(const index_iterator& it1,
+                        const index_iterator& it2) noexcept {
+    return it1.idx_ < it2.idx_;
+  }
+  friend bool operator>(const index_iterator& it1,
+                        const index_iterator& it2) noexcept {
+    return it1.idx_ > it2.idx_;
+  }
+  friend bool operator<=(const index_iterator& it1,
+                         const index_iterator& it2) noexcept {
+    return it1.idx_ <= it2.idx_;
+  }
+  friend bool operator>=(const index_iterator& it1,
+                         const index_iterator& it2) noexcept {
+    return it1.idx_ >= it2.idx_;
+  }
 
   const T& operator*() const noexcept { return idx_; }
   T& operator*() noexcept { return idx_; }
