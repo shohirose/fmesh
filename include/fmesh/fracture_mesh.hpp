@@ -256,9 +256,9 @@ class fracture_mesh {
 
   /// @name Flags to check if there are any invalid mesh entities.
   /// @{
-  bool has_invalid_vertices_;
-  bool has_invalid_edges_;
-  bool has_invalid_faces_;
+  bool has_invalid_vertices_ = false;
+  bool has_invalid_edges_ = false;
+  bool has_invalid_faces_ = false;
   /// @}
 };
 
