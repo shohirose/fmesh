@@ -11,11 +11,13 @@ int main() {
   const vector3d p2(1, 0, 0);
   const vector3d p3(0, 0, 1);
 
-  const auto v1 = mesh.add(p1);
-  const auto v2 = mesh.add(p2);
-  const auto v3 = mesh.add(p3);
+  const auto v1 = mesh.add_vertex(p1);
+  const auto v2 = mesh.add_vertex(p2);
+  const auto v3 = mesh.add_vertex(p3);
 
   const tri_face f1{v1, v2, v3};
 
-  mesh.add(f1);
+  const auto f1_idx = mesh.add_face(f1);
+
+  std::cout << "face [" << f1_idx << "]: " << f1 << std::endl;
 }
