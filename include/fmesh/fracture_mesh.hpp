@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <vector>
+
 #include "fmesh/edge.hpp"
 #include "fmesh/index.hpp"
 #include "fmesh/index_iterator.hpp"
@@ -33,7 +34,8 @@
 
 namespace fmesh {
 
-template <typename Point, typename Face>
+template <typename Point, typename Face,
+          typename PointAllocator = std::allocator<Point>>
 class fracture_mesh {
  public:
   /// @brief Returns the number of vertices
@@ -229,7 +231,7 @@ class fracture_mesh {
 
   /// @name Mesh entities
   /// @{
-  vertex_property<Point> vertices_;
+  vertex_property<Point, PointAllocator> vertices_;
   edge_property<fmesh::edge> edges_;
   face_property<Face> faces_;
   /// @}
@@ -262,8 +264,9 @@ class fracture_mesh {
   /// @}
 };
 
-template <typename Point, typename Face>
-vertex_index fracture_mesh<Point, Face>::add_vertex(const Point& p) {
+template <typename Point, typename Face, typename PointAllocator>
+vertex_index fracture_mesh<Point, Face, PointAllocator>::add_vertex(
+    const Point& p) {
   const vertex_index vi{vertices_.size()};
   vertices_.push_back(p);
   const auto n = vertices_.size();
@@ -274,9 +277,10 @@ vertex_index fracture_mesh<Point, Face>::add_vertex(const Point& p) {
   return vi;
 }
 
-template <typename Point, typename Face>
+template <typename Point, typename Face, typename PointAllocator>
 template <typename... Args>
-vertex_index fracture_mesh<Point, Face>::add_vertex(Args&&... args) {
+vertex_index fracture_mesh<Point, Face, PointAllocator>::add_vertex(
+    Args&&... args) {
   const vertex_index vi{vertices_.size()};
   vertices_.emplace_back(std::forward<Args>(args)...);
   const auto n = vertices_.size();
@@ -287,8 +291,8 @@ vertex_index fracture_mesh<Point, Face>::add_vertex(Args&&... args) {
   return vi;
 }
 
-template <typename Point, typename Face>
-face_index fracture_mesh<Point, Face>::add_face(const Face& f) {
+template <typename Point, typename Face, typename PointAllocator>
+face_index fracture_mesh<Point, Face, PointAllocator>::add_face(const Face& f) {
   if (this->find(f).is_valid()) {
     std::cerr << "Warning: face [" << f << "] is already registered.\n";
     return face_index{};
@@ -302,9 +306,10 @@ face_index fracture_mesh<Point, Face>::add_face(const Face& f) {
   return fi;
 }
 
-template <typename Point, typename Face>
+template <typename Point, typename Face, typename PointAllocator>
 template <typename... Args>
-face_index fracture_mesh<Point, Face>::add_face(Args&&... args) {
+face_index fracture_mesh<Point, Face, PointAllocator>::add_face(
+    Args&&... args) {
   const face_index fi{faces_.size()};
   faces_.emplace_back(std::forward<Args>(args)...);
   face_edges_.resize(faces_.size());
@@ -313,8 +318,8 @@ face_index fracture_mesh<Point, Face>::add_face(Args&&... args) {
   return fi;
 }
 
-template <typename Point, typename Face>
-void fracture_mesh<Point, Face>::invalidate(vertex_index vi) {
+template <typename Point, typename Face, typename PointAllocator>
+void fracture_mesh<Point, Face, PointAllocator>::invalidate(vertex_index vi) {
   has_invalid_vertices_ = true;
   is_valid_vertex_[vi] = false;
 
@@ -336,8 +341,8 @@ void fracture_mesh<Point, Face>::invalidate(vertex_index vi) {
   }
 }
 
-template <typename Point, typename Face>
-void fracture_mesh<Point, Face>::invalidate(face_index fi) {
+template <typename Point, typename Face, typename PointAllocator>
+void fracture_mesh<Point, Face, PointAllocator>::invalidate(face_index fi) {
   has_invalid_faces_ = true;
   is_valid_face_[fi] = false;
 
@@ -355,8 +360,8 @@ void fracture_mesh<Point, Face>::invalidate(face_index fi) {
   }
 }
 
-template <typename Point, typename Face>
-void fracture_mesh<Point, Face>::update_face_connectivity(
+template <typename Point, typename Face, typename PointAllocator>
+void fracture_mesh<Point, Face, PointAllocator>::update_face_connectivity(
     const face_index fi) noexcept {
   const auto& f = faces_[fi];
   for (auto&& vi : f) vertex_faces_[vi].push_back(fi);
@@ -391,8 +396,8 @@ void fracture_mesh<Point, Face>::update_face_connectivity(
   }
 }
 
-template <typename Point, typename Face>
-void fracture_mesh<Point, Face>::remove_invalid_entities() {
+template <typename Point, typename Face, typename PointAllocator>
+void fracture_mesh<Point, Face, PointAllocator>::remove_invalid_entities() {
   if (!this->has_invalid_entities()) return;
 
   if (has_invalid_vertices_) {

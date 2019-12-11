@@ -1,11 +1,9 @@
 target_sources(fmesh
-  PUBLIC
-    allocator.hpp
+  INTERFACE
     edge.hpp
     index.hpp
     index_iterator.hpp
     iterator_range.hpp
-    vector.hpp
     property_array.hpp
     property_registry.hpp
     type_traits.hpp

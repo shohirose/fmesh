@@ -26,7 +26,6 @@
 #include <cassert>
 #include <vector>
 
-#include "fmesh/allocator.hpp"
 #include "fmesh/index.hpp"
 #include "fmesh/type_traits.hpp"
 
@@ -37,7 +36,7 @@ struct property_array_base {
   virtual ~property_array_base() = default;
 };
 
-template <typename Key, typename T, typename Allocator = allocator<T>>
+template <typename Key, typename T, typename Allocator = std::allocator<T>>
 class property_array : public property_array_base<Key> {
  public:
   static_assert(is_index<Key>::value, "Key must be an index type.");
@@ -92,6 +91,7 @@ class property_array : public property_array_base<Key> {
   }
 
   void push_back(const T& t) { values_.push_back(t); }
+  void push_back(T&& t) { values_.push_back(std::move(t)); }
 
   reference operator[](Key key) noexcept {
     assert(static_cast<std::size_t>(key) < values_.size());
@@ -103,16 +103,16 @@ class property_array : public property_array_base<Key> {
   }
 
  private:
-  std::vector<T, Allocator> values_;
+  array_type values_;
 };
 
-template <typename T, typename Allocator = allocator<T>>
+template <typename T, typename Allocator = std::allocator<T>>
 using vertex_property = property_array<vertex_index, T, Allocator>;
 
-template <typename T, typename Allocator = allocator<T>>
+template <typename T, typename Allocator = std::allocator<T>>
 using edge_property = property_array<edge_index, T, Allocator>;
 
-template <typename T, typename Allocator = allocator<T>>
+template <typename T, typename Allocator = std::allocator<T>>
 using face_property = property_array<face_index, T, Allocator>;
 
 }  // namespace fmesh

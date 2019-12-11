@@ -24,12 +24,20 @@
 #include <vector>
 #include "fmesh/fixed_size_face.hpp"
 #include "fmesh/fracture_mesh.hpp"
-#include "fmesh/vector.hpp"
 
 using namespace fmesh;
 
+struct point {
+  double x;
+  double y;
+  double z;
+
+  point() = default;
+  point(double tx, double ty, double tz) : x{tx}, y{ty}, z{tz} {}
+};
+
 TEST(FmeshTest, FractureMeshTest) {
-  fracture_mesh<vector3d, tri_face> mesh;
+  fracture_mesh<point, tri_face> mesh;
 
   std::vector<vertex_index> v_ids;
   v_ids.push_back(mesh.add_vertex(0.0, 0.0, 0.0));
