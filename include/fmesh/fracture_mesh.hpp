@@ -344,6 +344,7 @@ void fracture_mesh<Point, Face>::update_face_connectivity(
       const edge_index ej{edges_.size()};
       edges_.push_back(e);
       edge_faces_.resize(edges_.size());
+      is_valid_edge_.push_back(true);
 
       // Update vertex-edges and vertex-vertices
       vertex_edges_[e.first].push_back(ej);
