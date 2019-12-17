@@ -38,7 +38,7 @@ struct point {
   point(double tx, double ty, double tz) : x{tx}, y{ty}, z{tz} {}
 };
 
-int main() {}
+int main() {
   fracture_mesh<point, tri_face> mesh;
 
   // Add vertices
