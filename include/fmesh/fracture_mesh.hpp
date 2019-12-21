@@ -26,11 +26,11 @@
 #include <algorithm>
 #include <vector>
 
+#include "fmesh/edge.hpp"
 #include "fmesh/index.hpp"
 #include "fmesh/index_iterator.hpp"
 #include "fmesh/iterator_range.hpp"
 #include "fmesh/property_array.hpp"
-#include "fmesh/undirected_edge.hpp"
 
 namespace fmesh {
 

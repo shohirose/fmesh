@@ -29,8 +29,8 @@
 #include <iostream>
 #include <type_traits>
 
+#include "fmesh/edge.hpp"
 #include "fmesh/index.hpp"
-#include "fmesh/undirected_edge.hpp"
 
 namespace fmesh {
 
@@ -75,8 +75,9 @@ class fixed_size_face {
       e.first = vertices_[i];
       e.second = vertices_[i + 1];
     }
-    edges[N - 1].first = vertices_[N - 1];
-    edges[N - 1].second = vertices_[0];
+    auto& e = edges[N - 1];
+    e.first = vertices_[N - 1];
+    e.second = vertices_[0];
     return edges;
   }
 

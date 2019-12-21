@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef FMESH_UNDIRECTED_EDGE_HPP
-#define FMESH_UNDIRECTED_EDGE_HPP
+#ifndef FMESH_EDGE_HPP
+#define FMESH_EDGE_HPP
 
 #include <iostream>
 
@@ -29,42 +29,47 @@
 
 namespace fmesh {
 
-struct undirected_edge {
+template <bool IsDirected>
+struct edge {
   vertex_index first;
   vertex_index second;
 
-  undirected_edge() = default;
+  edge() = default;
 
-  undirected_edge(vertex_index v1, vertex_index v2) : first{v1}, second{v2} {}
+  edge(vertex_index v1, vertex_index v2) : first{v1}, second{v2} {}
 
   bool contains(vertex_index v) const noexcept {
     return v == this->first || v == this->second;
   }
-  bool shares_vertex_with(const undirected_edge& other) const noexcept {
+  bool shares_vertex_with(const edge& other) const noexcept {
     return other.contains(first) || other.contains(second);
   }
   bool is_valid() const noexcept {
     return first.is_valid() && second.is_valid();
   }
 
-  friend bool operator==(const undirected_edge& e1,
-                         const undirected_edge& e2) noexcept {
-    return (e1.first == e2.first && e1.second == e2.second) ||
-           (e1.first == e2.second && e1.second == e2.first);
+  friend bool operator==(const edge& e1, const edge& e2) noexcept {
+    if constexpr (IsDirected)
+      return e1.first == e2.first && e1.second == e2.second;
+    else
+      return (e1.first == e2.first && e1.second == e2.second) ||
+             (e1.first == e2.second && e1.second == e2.first);
   }
-  friend bool operator!=(const undirected_edge& e1,
-                         const undirected_edge& e2) noexcept {
+  friend bool operator!=(const edge& e1, const edge& e2) noexcept {
     return !(e1 == e2);
   }
 
-  friend std::ostream& operator<<(std::ostream& os, const undirected_edge& e) {
+  friend std::ostream& operator<<(std::ostream& os, const edge& e) {
     return os << e.first << ' ' << e.second;
   }
-  friend std::istream& operator>>(std::istream& is, undirected_edge& e) {
+  friend std::istream& operator>>(std::istream& is, edge& e) {
     return is >> e.first >> e.second;
   }
 };
 
+using directed_edge = edge<true>;
+using undirected_edge = edge<false>;
+
 }  // namespace fmesh
 
-#endif  // FMESH_UNDIRECTED_EDGE_HPP
+#endif  // FMESH_EDGE_HPP

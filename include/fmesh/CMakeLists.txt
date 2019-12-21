@@ -1,7 +1,6 @@
 target_sources(fmesh
   INTERFACE
-    directed_edge.hpp
-    undirected_edge.hpp
+    edge.hpp
     index.hpp
     index_iterator.hpp
     iterator_range.hpp
