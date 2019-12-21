@@ -18,4 +18,6 @@ target_include_directories(fmesh
 add_library(fmesh::fmesh ALIAS fmesh)
 
 add_subdirectory(include)
+
+enable_testing()
 add_subdirectory(test)
