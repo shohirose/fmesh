@@ -26,11 +26,11 @@
 #include <algorithm>
 #include <vector>
 
-#include "fmesh/edge.hpp"
 #include "fmesh/index.hpp"
 #include "fmesh/index_iterator.hpp"
 #include "fmesh/iterator_range.hpp"
 #include "fmesh/property_array.hpp"
+#include "fmesh/undirected_edge.hpp"
 
 namespace fmesh {
 
@@ -38,6 +38,8 @@ template <typename Point, typename Face,
           typename PointAllocator = std::allocator<Point>>
 class fracture_mesh {
  public:
+  using edge_type = undirected_edge;
+
   /// @brief Returns the number of vertices
   auto num_vertices() const noexcept { return vertices_.size(); }
 
@@ -66,7 +68,7 @@ class fracture_mesh {
   /// @param[in] e Edge
   /// @return The index of a given edge. If the edge is not found, an invalid
   /// index is returned.
-  edge_index find(const fmesh::edge& e) const noexcept {
+  edge_index find(const edge_type& e) const noexcept {
     const auto& es = vertex_edges_[e.first];
     for (auto&& ei : es)
       if (edges_[ei] == e) return ei;
@@ -232,7 +234,7 @@ class fracture_mesh {
   /// @name Mesh entities
   /// @{
   vertex_property<Point, PointAllocator> vertices_;
-  edge_property<fmesh::edge> edges_;
+  edge_property<edge_type> edges_;
   face_property<Face> faces_;
   /// @}
 

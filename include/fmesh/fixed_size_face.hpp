@@ -29,8 +29,8 @@
 #include <iostream>
 #include <type_traits>
 
-#include "fmesh/edge.hpp"
 #include "fmesh/index.hpp"
+#include "fmesh/undirected_edge.hpp"
 
 namespace fmesh {
 
@@ -68,11 +68,15 @@ class fixed_size_face {
   auto* data() noexcept { return vertices_.data(); }
   const auto* data() const noexcept { return vertices_.data(); }
 
-  std::array<edge, N> to_edges() const noexcept {
-    std::array<edge, N> edges;
-    for (std::size_t i = 0; i < N - 1; ++i)
-      edges[i] = edge{vertices_[i], vertices_[i + 1]};
-    edges[N - 1] = edge{vertices_[N - 1], vertices_[0]};
+  std::array<undirected_edge, N> to_edges() const noexcept {
+    std::array<undirected_edge, N> edges;
+    for (std::size_t i = 0; i < N - 1; ++i) {
+      auto& e = edges[i];
+      e.first = vertices_[i];
+      e.second = vertices_[i + 1];
+    }
+    edges[N - 1].first = vertices_[N - 1];
+    edges[N - 1].second = vertices_[0];
     return edges;
   }
 
@@ -80,10 +84,10 @@ class fixed_size_face {
     return std::find(this->begin(), this->end(), v) != this->end();
   }
 
-  bool contains(const edge& e) const noexcept {
+  bool contains(const undirected_edge& e) const noexcept {
     for (std::size_t i = 0; i < N - 1; ++i)
-      if (e == edge{vertices_[i], vertices_[i + 1]}) return true;
-    if (e == edge{vertices_[N - 1], vertices_[0]}) return true;
+      if (e == undirected_edge{vertices_[i], vertices_[i + 1]}) return true;
+    if (e == undirected_edge{vertices_[N - 1], vertices_[0]}) return true;
     return false;
   }
 
